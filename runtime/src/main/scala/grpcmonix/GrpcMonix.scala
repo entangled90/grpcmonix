@@ -6,7 +6,7 @@ import monix.eval.{Callback, Task}
 import monix.execution.Ack.{Continue, Stop}
 import monix.execution.{Ack, Scheduler}
 import monix.reactive.Observable
-import monix.reactive.observables.ObservableLike.{Operator, Transformer}
+import monix.reactive.Observable.Operator
 import monix.reactive.observers.Subscriber
 import monix.reactive.subjects.PublishSubject
 import org.reactivestreams.{Subscriber => SubscriberR}
@@ -74,10 +74,10 @@ object GrpcMonix {
       grpcOperatorToMonixOperator(operator)
     )
 
-  def unliftByTransformer[I, O](transformer: Transformer[I, O], subscriber: Subscriber[O]): Subscriber[I] =
+  def unliftByTransformer[I, O](transformer: I => O, subscriber: Subscriber[O]): Subscriber[I] =
     new Subscriber[I] {
       private[this] val subject = PublishSubject[I]()
-      subject.transform(transformer).subscribe(subscriber)
+      subject.map(transformer).subscribe(subscriber)
 
       override implicit def scheduler: Scheduler = subscriber.scheduler
       override def onError(t: Throwable): Unit = subject.onError(t)

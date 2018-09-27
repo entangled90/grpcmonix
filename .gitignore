@@ -2,3 +2,7 @@
 *.log
 target/
 */target/
+
+.idea/
+.metals/
+.bloop/
