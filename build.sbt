@@ -7,9 +7,10 @@ bintrayRepository in ThisBuild := "maven"
 bintrayPackageLabels in ThisBuild := Seq("scala", "protobuf", "grpc", "monix")
 licenses in ThisBuild := ("MIT", url("http://opensource.org/licenses/MIT")) :: Nil
 
-scalaVersion in ThisBuild := "2.12.4"
+scalaVersion in ThisBuild := "2.12.7"
 
 val monixVersion = "3.0.0-RC1"
+
 lazy val runtime = (project in file("runtime"))
   .settings(
     crossScalaVersions := Seq("2.12.7", "2.11.11"),

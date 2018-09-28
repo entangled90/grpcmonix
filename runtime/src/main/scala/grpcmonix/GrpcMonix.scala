@@ -18,6 +18,8 @@ object GrpcMonix {
 
   type GrpcOperator[I, O] = StreamObserver[O] => StreamObserver[I]
 
+  type Transformer[I,O] = Observable[I] => Observable[O]
+
   def guavaFutureToMonixTask[T](future: ListenableFuture[T]): Task[T] =
     Task.deferFuture {
       Grpc.guavaFuture2ScalaFuture(future)
@@ -74,10 +76,10 @@ object GrpcMonix {
       grpcOperatorToMonixOperator(operator)
     )
 
-  def unliftByTransformer[I, O](transformer: I => O, subscriber: Subscriber[O]): Subscriber[I] =
+  def unliftByTransformer[I, O](transformer: Observable[I] => Observable[O], subscriber: Subscriber[O]): Subscriber[I] =
     new Subscriber[I] {
       private[this] val subject = PublishSubject[I]()
-      subject.map(transformer).subscribe(subscriber)
+      transformer(subject).subscribe(subscriber)
 
       override implicit def scheduler: Scheduler = subscriber.scheduler
       override def onError(t: Throwable): Unit = subject.onError(t)
